@@ -42,3 +42,6 @@ echo \033[96m LIGHT CYAN \033[0m DEFAULT | cmdcolor.exe
 Am I the only one who hates building stuff on his own?  
 [Download](https://mega.co.nz/#!kxsmCL6I!rseLDCHK02CKTMfPePwuGSY0sJ-gDpexDxoKWCWpotA).
 [Mirror](http://jeremejevs.com/u/cmdcolor.exe).
+
+Doesn't work? Paranoid? Hipster?  
+Take a look at `build.bat` to find out what you need to build it yourself.
