@@ -40,5 +40,5 @@ echo \033[96m LIGHT CYAN \033[0m DEFAULT | cmdcolor.exe
 ### Binaries
 
 Am I the only one who hates building stuff on his own?  
-[Download](http://jeremejevs.com/u/cmdcolor.exe).
-[Mirror](https://mega.co.nz/#!kxsmCL6I!rseLDCHK02CKTMfPePwuGSY0sJ-gDpexDxoKWCWpotA).
+[Download](https://mega.co.nz/#!kxsmCL6I!rseLDCHK02CKTMfPePwuGSY0sJ-gDpexDxoKWCWpotA).
+[Mirror](http://jeremejevs.com/u/cmdcolor.exe).
