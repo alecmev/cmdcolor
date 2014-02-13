@@ -1,33 +1,63 @@
 #include <cstring>
 #include <iostream>
+#include <sstream>
+#include <string>
 #include <windows.h>
 
 using std::cin;
 using std::cout;
 using std::endl;
+using std::string;
+using std::ostringstream;
 
+ostringstream tmpins;
 const int ntow[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
-int parse(bool *fore) {
-    char c, d;
+void rawget(char &c) {
     if (!cin.get(c).good()) {
         throw -1;
     }
+}
+
+void append(char c) {
+    tmpins << c;
+}
+
+void get(char &c) {
+    rawget(c);
+    append(c);
+}
+
+void reset() {
+    tmpins.str(string());
+    tmpins.clear();
+}
+
+void dump() {
+    cout << tmpins.str();
+    reset();
+}
+
+int parse(bool *fore) {
+    char c, d;
+
+    get(c);
     c -= '0';
     if (c == 0) {
-        throw -2;
+        throw -3;
     }
-    if (!cin.get(d).good()) {
-        throw -1;
-    }
+
+    get(d);
     d -= '0';
-    if (d < 0 || d > 7) {
-        throw -1;
-    }
     if (c == 1) {
-        if (d != 0 || !cin.get(d).good()) {
-            throw -1;
+        if (d != 0) {
+            throw -2;
         }
+        get(d);
+        d -= '0';
+    }
+    if (d < 0 || d > 7) {
+        throw -2;
     }
 
     int res = ntow[d];
@@ -49,85 +79,83 @@ int parse(bool *fore) {
             return (res + 8) << 4;
         }
         default: {
-            throw -1;
+            throw -2;
         }
     }
 }
 
 int main() {
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
     HANDLE con = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO definfo;
     GetConsoleScreenBufferInfo(con, &definfo);
+
     try {
         char c;
-        while (cin.get(c).good()) {
-            if (c == '\\') {
-                if (!cin.get(c).good()) {
-                    cout << '\\';
-                    throw -1;
-                }
-                if (c != '0') {
-                    cout << '\\' << c;
+        while (true) {
+            try {
+                rawget(c);
+                if (c != '\\' && c != 27) {
+                    cout << c;
                     continue;
                 }
-                if (!cin.get(c).good()) {
-                    cout << "\\0";
-                    throw -1;
-                }
-                if (c != '3') {
-                    cout << "\\0" << c;
-                    continue;
-                }
-                if (!cin.get(c).good()) {
-                    cout << "\\03";
-                    throw -1;
-                }
-                if (c != '3') {
-                    cout << "\\03" << c;
-                    continue;
-                }
-
-                c = 27;
-            }
-            if (c != 27) {
-                cout << c;
-                continue;
-            }
-            if (!cin.get(c).good()) {
-                cout << (char)27;
-                throw -1;
-            }
-            if (c != '[') {
-                cout << (char)27 << c;
-                continue;
-            }
-
-            int res = 0;
-            bool fore;
-            
-            do {
-                try {
-                    res = parse(&fore) + (res & (fore ? 0xF0 : 0x0F));
-                }
-                catch (int e) {
-                    if (e == -2) {
-                        res = definfo.wAttributes;
+                append(c);
+                if (c == '\\') {
+                    get(c);
+                    if (c != '0') {
+                        throw -2;
                     }
-                    else {
-                        throw;
+                    get(c);
+                    if (c != '3') {
+                        throw -2;
                     }
+                    get(c);
+                    if (c != '3') {
+                        throw -2;
+                    }
+                    c = 27;
                 }
-                
-                if (!cin.get(c).good()) {
-                    throw -1;
+                else if (c != 27) {
+                    throw -2;
                 }
-            } while (c == ';');
+                get(c);
+                if (c != '[') {
+                    throw -2;
+                }
 
-            if (c != 'm') {
-                continue;
+                int res = 0;
+                bool fore;
+                do {
+                    try {
+                        res = parse(&fore) + (res & (fore ? 0xF0 : 0x0F));
+                    }
+                    catch (int e) {
+                        if (-3 == e) {
+                            res = definfo.wAttributes;
+                        }
+                        else {
+                            throw;
+                        }
+                    }
+                    get(c);
+                } while (c == ';');
+
+                if (c != 'm') {
+                    throw -2;
+                }
+
+                SetConsoleTextAttribute(con, res);
+                reset();
             }
-
-            SetConsoleTextAttribute(con, res);
+            catch (int e) {
+                if (-2 == e) {
+                    dump();
+                    continue;
+                }
+                else {
+                    throw;
+                }
+            }
         }
     }
     catch (int e) {
