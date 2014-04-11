@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -9,6 +10,8 @@ using std::cout;
 using std::string;
 using std::ostringstream;
 
+HANDLE con;
+CONSOLE_SCREEN_BUFFER_INFO definfo;
 ostringstream tmpins;
 const int ntow[] = { 0, 4, 2, 6, 1, 5, 3, 7 };
 
@@ -39,7 +42,6 @@ void dump() {
 
 int parse(bool *fore) {
     char c, d;
-
     get(c);
     c -= '0';
     if (c == 0) {
@@ -55,6 +57,7 @@ int parse(bool *fore) {
         get(d);
         d -= '0';
     }
+
     if (d < 0 || d > 7) {
         throw -2;
     }
@@ -83,12 +86,21 @@ int parse(bool *fore) {
     }
 }
 
-int main() {
-    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-    HANDLE con = GetStdHandle(STD_OUTPUT_HANDLE);
-    CONSOLE_SCREEN_BUFFER_INFO definfo;
-    GetConsoleScreenBufferInfo(con, &definfo);
+void bye(int sig=0) {
+    if (con != NULL) {
+        SetConsoleTextAttribute(con, definfo.wAttributes);
+    }
 
+    exit(0);
+}
+
+int main() {
+    signal(SIGABRT, &bye);
+    signal(SIGINT, &bye);
+    signal(SIGTERM, &bye);
+    SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+    con = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(con, &definfo);
     try {
         char c;
         while (true) {
@@ -98,6 +110,7 @@ int main() {
                     cout << c;
                     continue;
                 }
+
                 append(c);
                 if (c == '\\') {
                     get(c);
@@ -117,6 +130,7 @@ int main() {
                 else if (c != 27) {
                     throw -2;
                 }
+
                 get(c);
                 if (c != '[') {
                     throw -2;
@@ -136,6 +150,7 @@ int main() {
                             throw;
                         }
                     }
+
                     get(c);
                 } while (c == ';');
 
@@ -160,5 +175,5 @@ int main() {
     catch (int e) {
     }
 
-    SetConsoleTextAttribute(con, definfo.wAttributes);
+    bye();
 }

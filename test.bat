@@ -1,0 +1,19 @@
+@ECHO OFF
+
+IF [%1] == [PIPE] (
+    GOTO :LOOP
+) ELSE (
+    CALL %0 PIPE | bin\cmdcolor.exe
+    GOTO :EOF
+)
+
+:LOOP
+ECHO \033[31mRED ON DEFAULT
+CALL :SLEEP
+ECHO \033[41mDEFAULT ON RED
+CALL :SLEEP
+GOTO :LOOP
+
+:SLEEP
+ping 1.2.3.4 -n 1 -w 1000 >NUL
+GOTO :EOF
