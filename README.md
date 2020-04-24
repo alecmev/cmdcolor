@@ -41,4 +41,4 @@ echo \033[96m LIGHT CYAN \033[0m DEFAULT | cmdcolor.exe
 
 *Am I the only one who hates building stuff on his own?*
 
-[Download v1.2.0](https://mega.co.nz/#!VkUT3IwB!cN-FbkjPkVClzgDd-TfkiUGqEc3Uy0tHSxZdYN5_Y2M)
+[Download the latest release](/../../releases/latest/download/cmdcolor.exe)
