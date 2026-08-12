@@ -1,3 +1,6 @@
+> [!WARNING]  
+> Unmaintained. [Windows supports ANSI colors natively now](https://ss64.com/nt/syntax-ansi.html).
+
 # cmdcolor
 
 Colorizes standard output on Windows:
